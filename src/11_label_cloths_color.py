@@ -166,7 +166,7 @@ def main():
         # Asumiendo que frame_numbers_json contiene los números de frame
         try:
             frames = json.loads(row['frame_numbers_json'])
-            first_frame = frames[0]
+            first_frame = frames[10]
             rgb_path = os.path.join(rgb_dir, f"{first_frame:06d}.jpg")
             sil_path = os.path.join(sil_dir, f"{first_frame:06d}.png")
             
