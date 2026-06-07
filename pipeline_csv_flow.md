@@ -32,8 +32,10 @@ graph TD
 
     %% Bloque de Oclusión
     subgraph Caracterización de Oclusión
-        B1 -->|Gilroy et al.| H1[11a_label_sequence_occlusion_gilroy.py]
-        H1 --> I1[(03_occlusion)]
+        B1 --> H1[11a_label_sequence_occlusion_gilroy.py]
+        B2 --> H1
+        B3 --> H1
+        H1 --> I1[(03_occlusion / Ext. Metadata)]
     end
 
     %% Bloque de Calidad de Silueta
@@ -100,7 +102,7 @@ Los archivos CSV resultantes han sido organizados en directorios numerados para 
   * `frame_start` / `frame_end`: Fotograma inicial y final de la secuencia.
   * `frame_gap_max`: Salto de fotograma máximo detectado.
   * `temporal_continuity_ratio`: Continuidad temporal del ciclo ($[0,1]$).
-  * `bbox_h_median` / `bbox_w_median` / `bbox_area_mean`: Métricas físicas del cuadro delimitador.
+  * `bbox_h_median` / `bbox_w_median` / `bbox_area_mean`: Dimensiones físicas del cuadro delimitador.
   * `estimated_step_period` ($T_i$): Periodo de paso dominante estimado por autocorrelación.
   * `estimated_cycle_length` ($L_i^{cycle}$): Ciclo completo de marcha estimado ($2T_i$).
   * `periodicity_score`: Puntuación de periodicidad de autocorrelación.
@@ -127,7 +129,7 @@ Los archivos CSV resultantes han sido organizados en directorios numerados para 
   * `illum_percentile_bin`: Categoría de percentil de calibración común (`Q1`-`Q4`).
 
 #### 📂 `03_occlusion/` (Generadas por `11a_label_sequence_occlusion_gilroy.py` y shards consolidadores)
-* **Uso:** Estimación objetiva del porcentaje de oclusión de peatones a nivel frame y secuencia usando 17 keypoints corporales de Detectron2.
+* **Uso:** Estimación objetiva del porcentaje de oclusión de peatones a nivel frame y secuencia usando 17 keypoints corporales de Detectron2. Se aplica de forma homóloga al corpus Propio, MARS e iLIDS-VID.
 * **Archivos:**
   * `gait_cycles_occlusion.csv`
   * `gait_cycle_frames_occlusion.csv`
@@ -212,7 +214,7 @@ Los archivos CSV resultantes han sido organizados en directorios numerados para 
   * `confirmed_ambiguous_identity_pairs.csv` (Los 90 pares de ambigüedad confirmada de la Fig. 7)
   * `unexplained_visual_ambiguity_pairs.csv` (Los 181 pares con ambigüedad inexplicable)
   * `gower_osnet_ambiguity_summary.csv` (Resumen de cuadrantes de la Fig. 5)
-  * `dataset_embedding_ambiguity_summary_osnet.csv` (Separabilidad global y cruzada entre cámaras de la Tabla 4 del paper)
+  * `dataset_embedding_ambiguity_summary_osnet.csv` (Separabilidad global y cruzada entre cámaras de la Tabla 4 del paper para OSNet)
   * `dataset_embedding_ambiguity_summary_clip.csv` (Separabilidad global y cruzada de CLIP)
 
 ---
