@@ -5,4 +5,7 @@ src/models/
 transforms/
 __pycache__/
 .idea/
-dataset/
+dataset_17062026.zip
+dataset/output/*
+#!dataset/output/metadata/
+#!dataset/output/embeddings/

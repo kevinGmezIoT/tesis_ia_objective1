@@ -11,23 +11,25 @@ TEXTS = {
         'illum_dist': 'Illumination Level Distribution',
         'lum_dist': 'Luminance Distribution',
         'pct': 'Percentage (%)',
-        'occ_dist': 'Occlusion Percentage Distribution',
-        'occ_ylabel': 'Occlusion (%)',
+        'occ_dist': 'Occlusion Level Distribution',
+        'occ_ylabel': 'Percentage (%)',
         'sq_dist': 'Silhouette Quality Distribution (SQQ)',
         'sq_ylabel': 'Foreground-Sum Quality Score',
         'proposed': 'Proposed',
-        'levels': {'Low': 'Low', 'Medium-Low': 'Medium-Low', 'Medium-High': 'Medium-High', 'High': 'High'}
+        'levels': {'Low': 'Low', 'Medium-Low': 'Medium-Low', 'Medium-High': 'Medium-High', 'High': 'High'},
+        'occ_levels': {'baja': 'Low', 'parcial': 'Partial', 'alta': 'Heavy'}
     },
     'es': {
         'illum_dist': 'Distribución de Nivel de Iluminación',
         'lum_dist': 'Distribución de Luminancia',
         'pct': 'Porcentaje (%)',
-        'occ_dist': 'Distribución de Porcentaje de Oclusión',
-        'occ_ylabel': 'Oclusión (%)',
+        'occ_dist': 'Distribución de Nivel de Oclusión',
+        'occ_ylabel': 'Porcentaje (%)',
         'sq_dist': 'Distribución de Calidad de Silueta (SQQ)',
         'sq_ylabel': 'Puntaje de Calidad (Foreground-Sum)',
         'proposed': 'Propuesto',
-        'levels': {'Low': 'Bajo', 'Medium-Low': 'Medio-Bajo', 'Medium-High': 'Medio-Alto', 'High': 'Alto'}
+        'levels': {'Low': 'Bajo', 'Medium-Low': 'Medio-Bajo', 'Medium-High': 'Medio-Alto', 'High': 'Alto'},
+        'occ_levels': {'baja': 'Baja', 'parcial': 'Parcial', 'alta': 'Alta'}
     }
 }
 
@@ -49,7 +51,7 @@ def main():
     
     # 1. Illumination
     illum_paths = {
-        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/sequences_illumination.csv",
+        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/02_illumination/sequences_illumination.csv",
         "MARS": "D:/open_datasets/MARS/metadata/sequences_illumination.csv",
         "iLIDS-VID": "D:/open_datasets/i-LIDS-VID/metadata/sequences_illumination.csv"
     }
@@ -57,7 +59,7 @@ def main():
     
     # 2. Occlusion
     occ_paths = {
-        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/sequences_occlusion.csv",
+        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/03_occlusion/gait_cycles_occlusion.csv",
         "MARS": "D:/open_datasets/MARS/metadata/sequences_occlusion.csv",
         "iLIDS-VID": "D:/open_datasets/i-LIDS-VID/metadata/sequences_occlusion.csv"
     }
@@ -65,7 +67,7 @@ def main():
     
     # 3. Silhouette Quality
     sq_paths = {
-        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/gait_cycles_quality.csv",
+        "Proposed": "D:/tesis_dev/result1/dataset/output/metadata/05_silhouette_quality/gait_cycles_quality.csv",
         "CASIA-B": "D:/open_datasets/CASIA-B/metadata/gait_cycles_quality.csv",
         "Gait3D": "D:/open_datasets/Gait3D/metadata/gait_cycles_quality.csv"
     }
@@ -103,17 +105,25 @@ def main():
             axes[0].set_ylabel(TEXTS[lang]['pct'])
             axes[0].set_xlabel("")
             axes[0].tick_params(axis='x', rotation=0)
-        elif not df_illum.empty and 'illum_y_mean' in df_illum.columns:
-            sns.boxplot(data=df_illum_plot, x='dataset', y='illum_y_mean', ax=axes[0])
-            axes[0].set_title(TEXTS[lang]['lum_dist'])
-            axes[0].set_xlabel("")
             
         # Panel 2: Occlusion
-        if not df_occ.empty and 'occlusion_pct' in df_occ.columns:
-            sns.boxplot(data=df_occ_plot, x='dataset', y='occlusion_pct', ax=axes[1], palette="Set2", hue='dataset', legend=False)
+        if not df_occ.empty and 'occlusion_label' in df_occ.columns:
+            occ_counts = df_occ_plot.groupby(['dataset', 'occlusion_label']).size().unstack(fill_value=0)
+            occ_pct = occ_counts.div(occ_counts.sum(axis=1), axis=0) * 100
+            
+            occ_levels_order = ['baja', 'parcial', 'alta']
+            occ_levels_present = [l for l in occ_levels_order if l in occ_pct.columns]
+            if occ_levels_present:
+                occ_pct = occ_pct[occ_levels_present]
+            
+            # Translate columns
+            occ_pct.rename(columns=TEXTS[lang]['occ_levels'], inplace=True)
+            
+            occ_pct.plot(kind='bar', stacked=True, ax=axes[1], colormap='autumn_r')
             axes[1].set_title(TEXTS[lang]['occ_dist'])
             axes[1].set_ylabel(TEXTS[lang]['occ_ylabel'])
             axes[1].set_xlabel("")
+            axes[1].tick_params(axis='x', rotation=0)
             
         # Panel 3: Silhouette Quality
         if not df_sq.empty and 'sil_quality_mean' in df_sq.columns:
